@@ -1,81 +1,40 @@
-from ollama import chat
+class ResearchAgent:
 
+    def run(self, workflow):
 
-class PlannerAgent:
+        try:
 
-    def run(self, task):
+            print("\n===== Research Agent =====")
 
-        prompt = f"""
-You are a Supervisor Planner Agent.
+            task = workflow.task
+            plan = workflow.plan
 
-User Task:
-{task}
+            research = f"""
+Task: {task}
 
-Your job is to create a detailed execution plan and assign work to:
+Research Notes:
+- Follow the planner's steps carefully.
+- Write clean and modular Python code.
+- Use meaningful variable and function names.
+- Include exception handling where required.
+- Test the code before final submission.
 
-1. Research Agent
-2. Code Generator Agent
-3. Reviewer Agent
-4. Test Agent
-
-Rules:
-- Give 3 to 5 tasks for each agent
-- Tasks must be short and specific
-- Number each task
-- Return only the plan
-- Do not explain anything
-
-Format:
-
-Research Agent
-1. Task
-2. Task
-3. Task
-
-Code Generator Agent
-1. Task
-2. Task
-3. Task
-
-Reviewer Agent
-1. Task
-2. Task
-3. Task
-
-Test Agent
-1. Task
-2. Task
-3. Task
+Planner Output:
+{plan}
 """
 
-        response = chat(
-            model="llama3.2",
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ]
-        )
+            workflow.research = research
 
-        planner_output = response["message"]["content"]
+            print("Research completed.")
 
-        return {
-            "task": task,
-            "plan": planner_output
-        }
+            return workflow
 
+        except Exception as e:
 
-if __name__ == "__main__":
+            workflow.errors.append(
+                f"ResearchAgent: {str(e)}"
+            )
 
-    planner = PlannerAgent()
+            print("Research Agent failed.")
 
-    task = input("Enter task: ")
-
-    data = planner.run(task)
-
-    print("\n" + "=" * 50)
-    print("PLANNER EXECUTION PLAN")
-    print("=" * 50 + "\n")
-
-    print(data["plan"])
+            raise

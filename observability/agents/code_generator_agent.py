@@ -5,9 +5,11 @@ class CodeGeneratorAgent:
 
     def run(self, workflow):
 
-        print("\n===== Code Generator Agent =====")
+        try:
 
-        prompt = f"""
+            print("\n===== Code Generator Agent =====")
+
+            prompt = f"""
 You are an expert Python developer.
 
 Task:
@@ -28,18 +30,28 @@ Requirements:
 - Return only the Python code.
 """
 
-        response = chat(
-            model="llama3.2",
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ]
-        )
+            response = chat(
+                model="llama3.2",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ]
+            )
 
-        workflow.code = response["message"]["content"]
+            workflow.code = response["message"]["content"]
 
-        print("Code generated.")
+            print("Code generated.")
 
-        return workflow
+            return workflow
+
+        except Exception as e:
+
+            workflow.errors.append(
+                f"CodeGeneratorAgent: {str(e)}"
+            )
+
+            print("Code Generator Agent failed.")
+
+            raise

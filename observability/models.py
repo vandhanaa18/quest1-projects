@@ -18,6 +18,8 @@ class WorkflowData:
 
     test_report: List[str] = field(default_factory=list)
 
-    detected_issues: List[str] = field(default_factory=list)
+detected_issues: List[str] = field(default_factory=list)
 
-    test_status: str = ""
+test_status: str = ""
+
+errors: List[str] = field(default_factory=list)

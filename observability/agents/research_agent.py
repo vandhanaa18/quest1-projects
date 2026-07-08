@@ -2,12 +2,14 @@ class ResearchAgent:
 
     def run(self, workflow):
 
-        print("\n===== Research Agent =====")
+        try:
 
-        task = workflow.task
-        plan = workflow.plan
+            print("\n===== Research Agent =====")
 
-        research = f"""
+            task = workflow.task
+            plan = workflow.plan
+
+            research = f"""
 Task: {task}
 
 Research Notes:
@@ -21,8 +23,18 @@ Planner Output:
 {plan}
 """
 
-        workflow.research = research
+            workflow.research = research
 
-        print("Research completed.")
+            print("Research completed.")
 
-        return workflow
+            return workflow
+
+        except Exception as e:
+
+            workflow.errors.append(
+                f"ResearchAgent: {str(e)}"
+            )
+
+            print("Research Agent failed.")
+
+            raise
