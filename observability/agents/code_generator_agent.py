@@ -1,57 +1,35 @@
-from ollama import chat
+import os
 
+from dotenv import load_dotenv
+from google.adk.agents import Agent
+from google.adk.models.lite_llm import LiteLlm
 
-class CodeGeneratorAgent:
+load_dotenv()
 
-    def run(self, workflow):
+code_generator_model = LiteLlm(
+    model="groq/llama-3.3-70b-versatile",
+    api_key=os.getenv("GROQ_API_KEY"),
+)
 
-        try:
+code_generator_agent = Agent(
+    name="code_generator_agent",
+    model=code_generator_model,
+    description="Generates code from implementation requirements.",
+    instruction="""
+You are the Code Generator Agent.
 
-            print("\n===== Code Generator Agent =====")
+Your ONLY responsibility is generating code.
 
-            prompt = f"""
-You are an expert Python developer.
+Do not create plans.
+Do not research technologies.
+Do not review code.
+Do not test code.
 
-Task:
-{workflow.task}
+Given a software requirement:
 
-Planner Output:
-{workflow.plan}
-
-Research Notes:
-{workflow.research}
-
-Generate clean Python code.
-
-Requirements:
-- Use functions.
-- Add comments.
-- Handle errors using try-except where appropriate.
-- Return only the Python code.
-"""
-
-            response = chat(
-                model="llama3.2",
-                messages=[
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ]
-            )
-
-            workflow.code = response["message"]["content"]
-
-            print("Code generated.")
-
-            return workflow
-
-        except Exception as e:
-
-            workflow.errors.append(
-                f"CodeGeneratorAgent: {str(e)}"
-            )
-
-            print("Code Generator Agent failed.")
-
-            raise
+1. Generate clean code.
+2. Use best practices.
+3. Add comments where useful.
+4. Return only the implementation.
+""",
+)

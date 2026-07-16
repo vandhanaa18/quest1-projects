@@ -1,60 +1,35 @@
-from models import WorkflowData
+import os
 
+from dotenv import load_dotenv
+from google.adk.agents import Agent
+from google.adk.models.lite_llm import LiteLlm
 
-class TestAgent:
+load_dotenv()
 
-    def run_tests(self, workflow: WorkflowData) -> WorkflowData:
+test_model = LiteLlm(
+    model="groq/llama-3.3-70b-versatile",
+    api_key=os.getenv("GROQ_API_KEY"),
+)
 
-        try:
+test_agent = Agent(
+    name="test_agent",
+    model=test_model,
+    description="Creates and evaluates software tests.",
+    instruction="""
+You are the Test Agent.
 
-            report = []
-            issues = []
+Your ONLY responsibility is testing.
 
-            # Execute tests only if review is approved
-            if workflow.review_status != "Approved":
+Do not generate production code.
+Do not research technologies.
+Do not create plans.
+Do not review code.
 
-                workflow.test_status = "NOT EXECUTED"
+Given source code:
 
-                report.append(
-                    "Testing was not executed because the code review was not approved."
-                )
-
-                workflow.test_report = report
-                workflow.detected_issues = workflow.review_comments
-
-                return workflow
-
-            code = workflow.code.strip()
-
-            # Simulated validation
-            report.append("Generated code detected.")
-
-            if "def " in code or "class " in code:
-                report.append("Program structure verified.")
-
-            if "return" in code:
-                report.append("Return statement verified.")
-
-            if "try:" in code:
-                report.append("Exception handling verified.")
-
-            report.append("Basic functionality validation completed.")
-
-            report.append("Code is ready for integration testing.")
-
-            workflow.test_status = "PASS"
-
-            workflow.test_report = report
-            workflow.detected_issues = issues
-
-            return workflow
-
-        except Exception as e:
-
-            workflow.errors.append(
-                f"TestAgent: {str(e)}"
-            )
-
-            print("Test Agent failed.")
-
-            raise
+1. Create test cases.
+2. Identify edge cases.
+3. Explain expected behavior.
+4. Report potential failures.
+""",
+)
