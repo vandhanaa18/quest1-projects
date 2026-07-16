@@ -2,3 +2,4 @@
 __pycache__/
 .adk
 *.db
+.DS_Store
