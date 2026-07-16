@@ -1,89 +1,34 @@
-from ollama import chat
+import os
 
+from dotenv import load_dotenv
+from google.adk.agents import Agent
+from google.adk.models.lite_llm import LiteLlm
 
-class PlannerAgent:
+load_dotenv()
 
-    def run(self, task):
+planner_model = LiteLlm(
+    model="groq/llama-3.3-70b-versatile",
+    api_key=os.getenv("GROQ_API_KEY"),
+)
 
-        try:
+planner_agent = Agent(
+    name="planner_agent",
+    model=planner_model,
+    description="Creates an implementation plan for software development tasks.",
+    instruction="""
+You are the Planner Agent.
 
-            prompt = f"""
-You are a Supervisor Planner Agent.
+Your ONLY responsibility is to create a clear implementation plan.
 
-User Task:
-{task}
+Do not generate code.
+Do not research technologies.
+Do not review code.
+Do not test code.
 
-Your job is to create a detailed execution plan and assign work to:
+Given the user's request:
 
-1. Research Agent
-2. Code Generator Agent
-3. Reviewer Agent
-4. Test Agent
-
-Rules:
-- Give 3 to 5 tasks for each agent
-- Tasks must be short and specific
-- Number each task
-- Return only the plan
-- Do not explain anything
-
-Format:
-
-Research Agent
-1. Task
-2. Task
-3. Task
-
-Code Generator Agent
-1. Task
-2. Task
-3. Task
-
-Reviewer Agent
-1. Task
-2. Task
-3. Task
-
-Test Agent
-1. Task
-2. Task
-3. Task
-"""
-
-            response = chat(
-                model="llama3.2",
-                messages=[
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ]
-            )
-
-            planner_output = response["message"]["content"]
-
-            return {
-                "task": task,
-                "plan": planner_output
-            }
-
-        except Exception as e:
-
-            print(f"Planner Agent failed: {e}")
-
-            raise
-
-
-if __name__ == "__main__":
-
-    planner = PlannerAgent()
-
-    task = input("Enter task: ")
-
-    data = planner.run(task)
-
-    print("\n" + "=" * 50)
-    print("PLANNER EXECUTION PLAN")
-    print("=" * 50 + "\n")
-
-    print(data["plan"])
+1. Understand the task.
+2. Break it into logical implementation steps.
+3. Return a concise numbered plan.
+""",
+)

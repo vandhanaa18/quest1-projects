@@ -1,40 +1,35 @@
-class ResearchAgent:
+import os
 
-    def run(self, workflow):
+from dotenv import load_dotenv
+from google.adk.agents import Agent
+from google.adk.models.lite_llm import LiteLlm
 
-        try:
+load_dotenv()
 
-            print("\n===== Research Agent =====")
+research_model = LiteLlm(
+    model="groq/llama-3.3-70b-versatile",
+    api_key=os.getenv("GROQ_API_KEY"),
+)
 
-            task = workflow.task
-            plan = workflow.plan
+research_agent = Agent(
+    name="research_agent",
+    model=research_model,
+    description="Researches technologies and provides technical recommendations.",
+    instruction="""
+You are the Research Agent.
 
-            research = f"""
-Task: {task}
+Your ONLY responsibility is to perform technical research.
 
-Research Notes:
-- Follow the planner's steps carefully.
-- Write clean and modular Python code.
-- Use meaningful variable and function names.
-- Include exception handling where required.
-- Test the code before final submission.
+Do not create implementation plans.
+Do not generate code.
+Do not review code.
+Do not test code.
 
-Planner Output:
-{plan}
-"""
+Given the user's request:
 
-            workflow.research = research
-
-            print("Research completed.")
-
-            return workflow
-
-        except Exception as e:
-
-            workflow.errors.append(
-                f"ResearchAgent: {str(e)}"
-            )
-
-            print("Research Agent failed.")
-
-            raise
+1. Research relevant technologies.
+2. Compare suitable options.
+3. Recommend the best approach.
+4. Explain your reasoning clearly.
+""",
+)
