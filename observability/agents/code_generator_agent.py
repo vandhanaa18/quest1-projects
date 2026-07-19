@@ -1,6 +1,10 @@
 from google.adk.agents import Agent
 
 from ..providers.llm_provider import ModelProvider
+from ..telemetry.callbacks import (
+    before_agent,
+    after_agent,
+)
 
 code_generator_agent = Agent(
     name="code_generator_agent",
@@ -23,4 +27,6 @@ Given a software requirement:
 3. Add comments where useful.
 4. Return only the implementation.
 """,
+    before_agent_callback=before_agent,
+    after_agent_callback=after_agent,
 )

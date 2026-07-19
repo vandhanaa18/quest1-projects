@@ -1,6 +1,10 @@
 from google.adk.agents import Agent
 
 from ..providers.llm_provider import ModelProvider
+from ..telemetry.callbacks import (
+    before_agent,
+    after_agent,
+)
 
 test_agent = Agent(
     name="test_agent",
@@ -23,4 +27,6 @@ Given source code:
 3. Explain expected behavior.
 4. Report potential failures.
 """,
+    before_agent_callback=before_agent,
+    after_agent_callback=after_agent,
 )
