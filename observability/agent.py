@@ -1,9 +1,7 @@
-import os
-
-from dotenv import load_dotenv
 from google.adk.agents import Agent
-from google.adk.models.lite_llm import LiteLlm
 from google.adk.tools import AgentTool
+
+from .providers.llm_provider import ModelProvider
 
 from .agents.planner_agent import planner_agent
 from .agents.research_agent import research_agent
@@ -11,12 +9,8 @@ from .agents.code_generator_agent import code_generator_agent
 from .agents.reviewer_agent import reviewer_agent
 from .agents.test_agent import test_agent
 
-load_dotenv()
-
-coordinator_model = LiteLlm(
-    model="groq/llama-3.3-70b-versatile",
-    api_key=os.getenv("GROQ_API_KEY"),
-)
+# Use the shared model from ModelProvider
+coordinator_model = ModelProvider.get_model()
 
 # Wrap specialist agents as tools
 planner_tool = AgentTool(planner_agent)

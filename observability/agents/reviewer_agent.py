@@ -1,19 +1,10 @@
-import os
-
-from dotenv import load_dotenv
 from google.adk.agents import Agent
-from google.adk.models.lite_llm import LiteLlm
 
-load_dotenv()
-
-reviewer_model = LiteLlm(
-    model="groq/llama-3.3-70b-versatile",
-    api_key=os.getenv("GROQ_API_KEY"),
-)
+from ..providers.llm_provider import ModelProvider
 
 reviewer_agent = Agent(
     name="reviewer_agent",
-    model=reviewer_model,
+    model=ModelProvider.get_model(),
     description="Reviews code quality and identifies issues.",
     instruction="""
 You are the Reviewer Agent.
