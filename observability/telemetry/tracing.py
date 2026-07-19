@@ -2,7 +2,7 @@ from opentelemetry import trace
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (
-    BatchSpanProcessor,
+    SimpleSpanProcessor,
     ConsoleSpanExporter,
 )
 
@@ -21,12 +21,16 @@ resource = Resource.create(
 # Create and configure the Tracer Provider
 provider = TracerProvider(resource=resource)
 
-# Add a span processor with a console exporter
-processor = BatchSpanProcessor(ConsoleSpanExporter())
+# Export spans immediately to the terminal
+processor = SimpleSpanProcessor(ConsoleSpanExporter())
 provider.add_span_processor(processor)
 
-# Register the provider globally
-trace.set_tracer_provider(provider)
+# Register the provider globally (only once)
+try:
+    trace.set_tracer_provider(provider)
+except Exception:
+    # Tracer provider is already registered
+    pass
 
 # Shared tracer instance
 tracer = trace.get_tracer(SERVICE_NAME)
@@ -42,6 +46,5 @@ def get_tracer():
 def shutdown_tracing():
     """
     Flushes any pending spans and shuts down the tracer provider.
-    Call this before the application exits.
     """
     provider.shutdown()
