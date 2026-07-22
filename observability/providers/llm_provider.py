@@ -23,7 +23,8 @@ class ModelProvider:
 
             elif provider == "ollama":
                 cls._model = LiteLlm(
-                    model="ollama_chat/qwen3:8b",
+                    model=os.getenv("OLLAMA_MODEL"),
+                    api_base=os.getenv("OLLAMA_BASE_URL"),
                 )
 
             else:
