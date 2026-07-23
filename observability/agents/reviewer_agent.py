@@ -6,6 +6,10 @@ from ..telemetry.callbacks import (
     after_agent,
 )
 
+from ..tools.review_tool import (
+    review_tool,
+)
+
 reviewer_agent = Agent(
     name="reviewer_agent",
     model=ModelProvider.get_model(),
@@ -13,20 +17,24 @@ reviewer_agent = Agent(
     instruction="""
 You are the Reviewer Agent.
 
-Your ONLY responsibility is reviewing code.
+Your responsibilities are:
+
+1. Review source code.
+2. Identify bugs.
+3. Detect code smells.
+4. Suggest improvements.
+5. Use the Review Tool to analyze code quality.
 
 Do not generate code.
 Do not research technologies.
-Do not create plans.
+Do not create implementation plans.
 Do not test code.
 
-Given source code:
-
-1. Identify bugs.
-2. Identify code smells.
-3. Suggest improvements.
-4. Explain issues clearly.
+Return a clear review report with recommendations.
 """,
     before_agent_callback=before_agent,
     after_agent_callback=after_agent,
+    tools=[
+        review_tool,
+    ],
 )

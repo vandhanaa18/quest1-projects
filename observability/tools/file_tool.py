@@ -1,9 +1,13 @@
+from google.adk.tools import FunctionTool
 from pathlib import Path
 
 WORKSPACE = Path("workspace").resolve()
 
 
 def read_file(filename: str):
+    """
+    Read a file only from the workspace directory.
+    """
     file_path = (WORKSPACE / filename).resolve()
 
     if not str(file_path).startswith(str(WORKSPACE)):
@@ -16,6 +20,9 @@ def read_file(filename: str):
 
 
 def write_file(filename: str, content: str):
+    """
+    Write a file only inside the workspace directory.
+    """
     file_path = (WORKSPACE / filename).resolve()
 
     if not str(file_path).startswith(str(WORKSPACE)):
@@ -29,3 +36,7 @@ def write_file(filename: str, content: str):
     file_path.write_text(content)
 
     return f"Saved {filename}"
+
+
+read_file_tool = FunctionTool(func=read_file)
+write_file_tool = FunctionTool(func=write_file)
