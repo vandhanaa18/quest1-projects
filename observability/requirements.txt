@@ -1,4 +1,4 @@
-google-adk
+google-adk[extensions]
 litellm
 python-dotenv
 opentelemetry-api
