@@ -34,6 +34,8 @@ Do not test code.
     before_agent_callback=before_agent,
     after_agent_callback=after_agent,
    tools=[
-    documentation_tool,
+       google_search_tool,
+       documentation_tool,
+       api_search_tool,
 ]
 )

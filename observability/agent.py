@@ -1,5 +1,4 @@
 from google.adk.agents import Agent
-from google.adk.tools import AgentTool
 
 from .providers.llm_provider import ModelProvider
 
@@ -9,15 +8,8 @@ from .agents.code_generator_agent import code_generator_agent
 from .agents.reviewer_agent import reviewer_agent
 from .agents.test_agent import test_agent
 
-# Use the shared model from ModelProvider
+# Shared model
 coordinator_model = ModelProvider.get_model()
-
-# Wrap specialist agents as tools
-planner_tool = AgentTool(planner_agent)
-research_tool = AgentTool(research_agent)
-code_tool = AgentTool(code_generator_agent)
-review_tool = AgentTool(reviewer_agent)
-test_tool = AgentTool(test_agent)
 
 root_agent = Agent(
     name="software_development_coordinator",
@@ -29,15 +21,12 @@ You are the Root Agent responsible for coordinating the software development wor
 Your responsibilities are:
 
 1. Understand the user's request.
-2. Determine whether the request is:
-   - A new task
-   - A continuation of an existing task
-3. Always consult the Planner Agent first.
-4. Based on the Planner Agent's execution plan, invoke the required specialist agents in the correct order.
-5. Combine the outputs from all invoked agents into a final response.
+2. Determine whether it is a new task or a continuation.
+3. Delegate work to the appropriate sub-agent.
+4. Coordinate the overall workflow.
+5. Combine the outputs from sub-agents into the final response.
 
-Available specialist agents:
-
+Available sub-agents:
 - Planner Agent
 - Research Agent
 - Code Generator Agent
@@ -46,15 +35,15 @@ Available specialist agents:
 
 Rules:
 - Never perform specialist tasks yourself.
-- The Planner Agent decides the workflow.
-- Invoke only the agents required for the current request.
-- Preserve workflow context across multi-turn conversations whenever possible.
+- Delegate work to the appropriate sub-agent.
+- Invoke only the required sub-agents.
+- Preserve workflow context whenever possible.
 """,
-    tools=[
-        planner_tool,
-        research_tool,
-        code_tool,
-        review_tool,
-        test_tool,
+    sub_agents=[
+        planner_agent,
+        research_agent,
+        code_generator_agent,
+        reviewer_agent,
+        test_agent,
     ],
 )
