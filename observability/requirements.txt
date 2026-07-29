@@ -4,3 +4,4 @@ python-dotenv
 opentelemetry-api
 opentelemetry-sdk
 ollama
+ddgs

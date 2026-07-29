@@ -1,6 +1,7 @@
 from google.adk.tools import FunctionTool
 from pathlib import Path
 
+
 WORKSPACE = Path("workspace").resolve()
 
 
@@ -18,11 +19,14 @@ def read_file(filename: str) -> str:
     try:
         file_path = (WORKSPACE / filename).resolve()
 
-        if not str(file_path).startswith(str(WORKSPACE)):
+        if not file_path.is_relative_to(WORKSPACE):
             return "Access denied: File must be inside the workspace."
 
         if not file_path.exists():
             return f"File not found: {filename}"
+
+        if not file_path.is_file():
+            return f"Not a file: {filename}"
 
         return file_path.read_text(encoding="utf-8")
 
@@ -45,11 +49,15 @@ def write_file(filename: str, content: str) -> str:
     try:
         file_path = (WORKSPACE / filename).resolve()
 
-        if not str(file_path).startswith(str(WORKSPACE)):
+        if not file_path.is_relative_to(WORKSPACE):
             return "Access denied: File must be inside the workspace."
 
         file_path.parent.mkdir(parents=True, exist_ok=True)
-        file_path.write_text(content, encoding="utf-8")
+
+        file_path.write_text(
+            content,
+            encoding="utf-8",
+        )
 
         return (
             f"File saved successfully.\n"

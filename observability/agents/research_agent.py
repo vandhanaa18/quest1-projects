@@ -6,36 +6,39 @@ from ..telemetry.callbacks import (
     after_agent,
 )
 
-from ..tools.google_search_tool import google_search_tool
-from ..tools.documentation_tool import documentation_tool
-from ..tools.api_search_tool import api_search_tool
+from ..tools.ddg_search_tool import ddg_search_tool
+
 
 research_agent = Agent(
     name="research_agent",
     model=ModelProvider.get_model(),
-    description="Researches technologies and provides technical recommendations.",
+    description="Researches topics and external information and provides concise findings and recommendations.",
     instruction="""
 You are the Research Agent.
 
-Your responsibilities are:
+Research information required by the user's request.
 
-1. Research relevant technologies.
-2. Compare suitable options.
-3. Recommend the best approach.
-4. Use the Google Search Tool when web information is required.
-5. Use the Documentation Tool to retrieve official documentation.
-6. Use the API Search Tool to find suitable APIs.
+Rules:
+- Use DDG only when external information is required.
+- Use at most 3 searches.
+- Each search must target different needed information.
+- Do not repeat similar searches.
+- Stop searching once enough information is available.
+- Keep findings concise.
+- Do not generate code, plan, review, or test.
+- Do not explain reasoning or workflow.
 
-Do not generate code.
-Do not create implementation plans.
-Do not review code.
-Do not test code.
+Return:
+
+Research Findings:
+- ...
+
+Recommendation:
+...
 """,
     before_agent_callback=before_agent,
     after_agent_callback=after_agent,
-   tools=[
-       google_search_tool,
-       documentation_tool,
-       api_search_tool,
-]
+    tools=[
+        ddg_search_tool,
+    ],
 )

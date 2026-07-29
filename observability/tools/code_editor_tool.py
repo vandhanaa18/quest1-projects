@@ -1,70 +1,48 @@
 from google.adk.tools import FunctionTool
+from pathlib import Path
 
 
-def generate_code(requirement: str) -> str:
+WORKSPACE = Path("workspace").resolve()
+
+
+def edit_code(file_path: str, old_code: str, new_code: str) -> str:
     """
-    Provide code templates or starter snippets for common programming tasks.
+    Replace existing code in a file inside the workspace.
 
     Args:
-        requirement: Description of the programming task.
+        file_path: Relative path to the file inside the workspace.
+        old_code: Existing code to replace.
+        new_code: New code to insert.
 
     Returns:
-        A relevant code template or boilerplate.
+        Success or error message.
     """
 
-    requirement = requirement.lower()
+    try:
+        path = (WORKSPACE / file_path).resolve()
 
-    if "stack" in requirement and "python" in requirement:
-        return """
-Python Stack Template
+        if not path.is_relative_to(WORKSPACE):
+            return "Access denied: File must be inside the workspace."
 
-class Stack:
-    def __init__(self):
-        self.items = []
+        if not path.exists():
+            return f"Edit failed: File not found: {file_path}"
 
-    def push(self, item):
-        self.items.append(item)
+        if not path.is_file():
+            return f"Edit failed: Not a file: {file_path}"
 
-    def pop(self):
-        if self.items:
-            return self.items.pop()
-        return None
+        content = path.read_text(encoding="utf-8")
 
-    def peek(self):
-        return self.items[-1] if self.items else None
+        if old_code not in content:
+            return f"Edit failed: specified code was not found in {file_path}."
 
-    def is_empty(self):
-        return len(self.items) == 0
-"""
+        updated_content = content.replace(old_code, new_code, 1)
 
-    elif "queue" in requirement and "python" in requirement:
-        return """
-from collections import deque
+        path.write_text(updated_content, encoding="utf-8")
 
-queue = deque()
+        return f"Successfully edited {file_path}"
 
-queue.append(10)
-queue.append(20)
-
-queue.popleft()
-"""
-
-    elif "flask" in requirement:
-        return """
-from flask import Flask
-
-app = Flask(__name__)
-
-@app.route("/")
-def home():
-    return "Hello, World!"
-
-if __name__ == "__main__":
-    app.run(debug=True)
-"""
-
-    else:
-        return "No template available for the requested requirement."
+    except Exception as e:
+        return f"Edit failed: {e}"
 
 
-code_editor_tool = FunctionTool(func=generate_code)
+code_editor_tool = FunctionTool(func=edit_code)
