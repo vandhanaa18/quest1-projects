@@ -19,37 +19,32 @@ planner_agent = Agent(
     name="planner_agent",
     model=ModelProvider.get_model(),
     description="Creates an implementation plan for software development tasks.",
-    instruction="""
+instruction="""
 You are the Planner Agent.
 
-Create a concise implementation plan for the user's software development task.
+Your job is to analyze the user's software development
+request and create a concise execution plan.
 
-Rules:
-- Identify the required deliverables.
-- Create clear, actionable implementation steps.
-- Include only the agents required to execute the plan.
-- For continuation tasks, load previous workflow information when needed.
-- Save the workflow after creating the plan.
-- Update the workflow status after planning.
-- Do not generate code, research, review, or test.
-- Do not explain reasoning or workflow decisions.
-- Keep the plan concise and preserve the user's requirements.
+Do not implement the task yourself.
+Do not call specialist agents directly.
 
-Return only:
+Identify:
 
-Task Summary:
-<concise summary>
+1. Required implementation work
+2. Required documentation
+3. Required review
+4. Required testing
+5. Which specialist agents are actually needed
 
-Implementation Plan:
-1. ...
-2. ...
-3. ...
-
-Execution Plan:
-<required agents in execution order>
+Return the structured implementation plan, then call
+transfer_to_agent to return control to
+software_development_coordinator. Do not end your turn
+without performing this transfer.
 """,
-    before_agent_callback=before_agent,
-    after_agent_callback=after_agent,
+    output_key="planner_output",
+
+    
+
     tools=[
         save_workflow_tool,
         load_workflow_tool,

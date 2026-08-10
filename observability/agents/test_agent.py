@@ -14,38 +14,46 @@ test_agent = Agent(
     name="test_agent",
     model=ModelProvider.get_model(),
     description="Creates and evaluates software tests.",
+
     instruction="""
 You are the Test Agent.
 
-Validate whether the provided implementation satisfies the required behavior.
+Validate the implementation against the original requirements.
 
-Rules:
-- Create relevant functional and edge-case tests.
-- Determine the expected result for each test.
-- Use the Execution Tool when code execution is needed.
-- Do not modify production code.
-- Do not research, plan, or perform general code review.
-- Do not explain reasoning or workflow.
-- Do not repeat the implementation.
-- Keep tests focused and concise.
-- Return PASS only if all required tested behavior works.
-- Clearly report any failing behavior or execution error.
+PLANNER HANDOFF:
+{planner_output}
 
-Return only:
+CODE GENERATOR HANDOFF:
+{code_output}
 
-Test Status:
+REVIEWER HANDOFF:
+{reviewer_output}
+
+Create and execute relevant functional and edge-case tests.
+
+Return exactly:
+
+TEST_STATUS:
 <PASS or FAIL>
 
-Tests:
-- <test>: <PASS or FAIL>
+TESTS:
+<tests performed>
 
-Failures:
-- <failure details>
+FAILURES:
+<failures or None>
 
-Use "Failures: None" when all tests pass.
+FINAL_RESULT:
+<summary>
+After completing your work, call transfer_to_agent to return
+control to software_development_coordinator. Do not end your
+turn without performing this transfer.
 """,
+
+    output_key="test_output",
+
     before_agent_callback=before_agent,
     after_agent_callback=after_agent,
+
     tools=[
         execution_tool,
     ],

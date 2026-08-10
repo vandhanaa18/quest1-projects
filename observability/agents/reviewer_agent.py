@@ -14,35 +14,43 @@ reviewer_agent = Agent(
     name="reviewer_agent",
     model=ModelProvider.get_model(),
     description="Reviews code quality and identifies issues.",
+
     instruction="""
 You are the Reviewer Agent.
 
-Review the provided code for correctness, requirements, quality, and maintainability.
+Review the implementation created by the Code Generator.
 
-Rules:
-- Identify meaningful bugs, correctness issues, unmet requirements, and maintainability problems.
-- Suggest specific corrections when issues are found.
-- Use the Review Tool only when needed.
-- Do not generate or test code.
-- Do not research or create plans.
-- Do not explain reasoning or workflow.
-- Do not repeat the implementation.
-- Avoid unnecessary stylistic suggestions.
-- Keep the review concise and actionable.
-- Return PASS only when no meaningful issues remain.
+PLANNER HANDOFF:
+{planner_output}
 
-Return only:
+CODE GENERATOR HANDOFF:
+{code_output}
 
-Review Status:
-<PASS or NEEDS_CHANGES>
+Review the actual implementation/files.
 
-Issues:
-- <issue and required correction>
+Return exactly:
 
-Use "Issues: None" when the review passes.
+REVIEW_STATUS:
+<PASS or FAIL>
+
+ISSUES:
+<issues or None>
+
+REQUIRED_FIXES:
+<fixes or None>
+
+HANDOFF_TO_TEST:
+<information required by Test Agent>
+After completing your work, call transfer_to_agent to return
+control to software_development_coordinator. Do not end your
+turn without performing this transfer.
 """,
+
+    output_key="reviewer_output",
+
     before_agent_callback=before_agent,
     after_agent_callback=after_agent,
+
     tools=[
         review_tool,
     ],
