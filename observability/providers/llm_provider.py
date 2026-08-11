@@ -25,7 +25,7 @@ class ModelProvider:
                 cls._model = LiteLlm(
                     model=os.getenv("OLLAMA_MODEL"),
                     api_base=os.getenv("OLLAMA_BASE_URL"),
-                    num_ctx=8192,
+                    num_ctx=131072,
                 )
 
             else:
