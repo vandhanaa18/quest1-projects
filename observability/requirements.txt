@@ -5,3 +5,4 @@ opentelemetry-api
 opentelemetry-sdk
 ollama
 ddgs
+opentelemetry-exporter-otlp

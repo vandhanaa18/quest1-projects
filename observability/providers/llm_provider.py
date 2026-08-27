@@ -13,19 +13,20 @@ class ModelProvider:
     def get_model(cls):
         if cls._model is None:
 
-            provider = os.getenv("MODEL_PROVIDER", "groq").lower()
+            provider = os.getenv("MODEL_PROVIDER", "ollama").lower()
 
-            if provider == "groq":
-                cls._model = LiteLlm(
-                    model="groq/llama-3.1-8b-instant",
-                    api_key=os.getenv("GROQ_API_KEY"),
-                )
-
-            elif provider == "ollama":
+            if provider == "ollama":
                 cls._model = LiteLlm(
                     model=os.getenv("OLLAMA_MODEL"),
                     api_base=os.getenv("OLLAMA_BASE_URL"),
                     num_ctx=131072,
+                    reasoning_effort="none",
+                )
+
+            elif provider == "groq":
+                cls._model = LiteLlm(
+                    model="groq/llama-3.1-8b-instant",
+                    api_key=os.getenv("GROQ_API_KEY"),
                 )
 
             else:

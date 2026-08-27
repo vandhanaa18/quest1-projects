@@ -1,50 +1,46 @@
+import os
+
 from opentelemetry import trace
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import (
-    SimpleSpanProcessor,
-    ConsoleSpanExporter,
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import (
+    OTLPSpanExporter,
 )
 
-# Service information
-SERVICE_NAME = "observability"
-SERVICE_VERSION = "1.0.0"
 
-# Define the resource for this service
+SERVICE_NAME = "multi-agent-observability"
+
 resource = Resource.create(
     {
         "service.name": SERVICE_NAME,
-        "service.version": SERVICE_VERSION,
+        "service.version": "1.0.0",
     }
 )
 
-# Create and configure the Tracer Provider
 provider = TracerProvider(resource=resource)
 
-# Export spans immediately to the terminal
-processor = SimpleSpanProcessor(ConsoleSpanExporter())
-provider.add_span_processor(processor)
+otlp_endpoint = os.getenv(
+    "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT",
+    "http://localhost:4318/v1/traces",
+)
 
-# Register the provider globally (only once)
-try:
-    trace.set_tracer_provider(provider)
-except Exception:
-    # Tracer provider is already registered
-    pass
+span_exporter = OTLPSpanExporter(
+    endpoint=otlp_endpoint,
+)
 
-# Shared tracer instance
+provider.add_span_processor(
+    BatchSpanProcessor(span_exporter)
+)
+
+trace.set_tracer_provider(provider)
+
 tracer = trace.get_tracer(SERVICE_NAME)
 
 
 def get_tracer():
-    """
-    Returns the shared tracer instance.
-    """
     return tracer
 
 
 def shutdown_tracing():
-    """
-    Flushes any pending spans and shuts down the tracer provider.
-    """
     provider.shutdown()

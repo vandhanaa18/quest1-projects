@@ -2,25 +2,34 @@ from google.adk.tools import FunctionTool
 from pathlib import Path
 
 
-WORKSPACE = Path("workspace").resolve()
+# Workspace is located inside the project directory.
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+WORKSPACE = PROJECT_ROOT / "workspace"
+
+# Create workspace if it does not already exist.
+WORKSPACE.mkdir(parents=True, exist_ok=True)
+
+
+def _safe_path(filename: str) -> Path:
+    """
+    Resolve a workspace-relative path safely.
+    """
+
+    file_path = (WORKSPACE / filename).resolve()
+
+    if not file_path.is_relative_to(WORKSPACE):
+        raise ValueError("Access denied: file must be inside the workspace.")
+
+    return file_path
 
 
 def read_file(filename: str) -> str:
     """
     Read a text file from the workspace directory.
-
-    Args:
-        filename: Relative path to the file inside the workspace.
-
-    Returns:
-        File contents or an error message.
     """
 
     try:
-        file_path = (WORKSPACE / filename).resolve()
-
-        if not file_path.is_relative_to(WORKSPACE):
-            return "Access denied: File must be inside the workspace."
+        file_path = _safe_path(filename)
 
         if not file_path.exists():
             return f"File not found: {filename}"
@@ -37,20 +46,10 @@ def read_file(filename: str) -> str:
 def write_file(filename: str, content: str) -> str:
     """
     Write text to a file inside the workspace directory.
-
-    Args:
-        filename: Relative path to the destination file.
-        content: Text content to write.
-
-    Returns:
-        Success or error message.
     """
 
     try:
-        file_path = (WORKSPACE / filename).resolve()
-
-        if not file_path.is_relative_to(WORKSPACE):
-            return "Access denied: File must be inside the workspace."
+        file_path = _safe_path(filename)
 
         file_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -60,8 +59,8 @@ def write_file(filename: str, content: str) -> str:
         )
 
         return (
-            f"File saved successfully.\n"
-            f"Location: {filename}\n"
+            "File saved successfully.\n"
+            f"Location: {file_path}\n"
             f"Characters Written: {len(content)}"
         )
 

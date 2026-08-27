@@ -4,3 +4,5 @@ __pycache__/
 .adk
 *.db
 *.pyc
+.DS_Store
+workspace/

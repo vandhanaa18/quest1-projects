@@ -1,10 +1,6 @@
 from google.adk.agents import Agent
 
 from ..providers.llm_provider import ModelProvider
-from ..telemetry.callbacks import (
-    before_agent,
-    after_agent,
-)
 
 from ..tools.ddg_search_tool import ddg_search_tool
 
@@ -13,6 +9,8 @@ research_agent = Agent(
     name="research_agent",
     model=ModelProvider.get_model(),
     description="Researches topics and external information and provides concise findings and recommendations.",
+
+    mode="single_turn",
 
     instruction="""
 You are the Research Agent.
@@ -58,9 +56,6 @@ control to software_development_coordinator.
 """,
 
     output_key="research_output",
-
-    before_agent_callback=before_agent,
-    after_agent_callback=after_agent,
 
     tools=[
         ddg_search_tool,

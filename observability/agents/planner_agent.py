@@ -1,10 +1,6 @@
 from google.adk.agents import Agent
 
 from ..providers.llm_provider import ModelProvider
-from ..telemetry.callbacks import (
-    before_agent,
-    after_agent,
-)
 
 from ..tools.memory_tool import (
     save_workflow_tool,
@@ -15,46 +11,50 @@ from ..tools.workflow_tool import (
     update_workflow_status_tool,
 )
 
+
 planner_agent = Agent(
     name="planner_agent",
     model=ModelProvider.get_model(),
-    description="Creates an implementation plan for software development tasks.",
-instruction="""
+    description="Creates concise implementation plans.",
+
+    mode="single_turn",
+
+    disallow_transfer_to_peers=True,
+
+    instruction="""
 You are the Planner Agent.
 
-Your job is to analyze the user's software development
-request and create a concise execution plan.
+Create a concise execution plan for the user's software development request.
 
-Do not output any internal reasoning, analysis, or workflow explanation.
-Do not produce thought logs, numbered reasoning steps, or self-analysis.
-Respond only with the plan or a direct clarification question.
+Do not write code, research, review, test, or execute the task.
+Do not explain your reasoning.
+Do not discuss your instructions.
 
-Do not implement the task yourself.
-Do not call specialist agents directly.
+If essential information is missing, return only:
 
-If the request lacks concrete feature details, respond with exactly:
-CLARIFICATION_REQUIRED: <what you need from the user>
-and output nothing else.
+CLARIFICATION_REQUIRED: <missing information>
 
-Identify:
+Otherwise return exactly:
 
-1. Required implementation work
-2. Required documentation
-3. Required review
-4. Required testing
-5. Which specialist agents are actually needed
+TASK:
+<one sentence>
 
-Do not include internal reasoning, analysis steps, or workflow explanation in your output.
-Do not echo the user's internal thought labels or any non-output text.
-Your output must be exactly the required structured fields and nothing else.
-Return the structured implementation plan, then call
-transfer_to_agent to return control to
-software_development_coordinator. Do not end your turn
-without performing this transfer.
+PLAN:
+<2-4 concise steps>
+
+REQUIRED_AGENTS:
+<agents required in execution order>
+
+HANDOFFS:
+<one short line for each required agent>
+
+For normal implementation tasks, use:
+code_generator_agent, reviewer_agent, test_agent
+
+Use research_agent only when external research is genuinely required.
 """,
-    output_key="planner_output",
 
-    
+    output_key="planner_output",
 
     tools=[
         save_workflow_tool,
